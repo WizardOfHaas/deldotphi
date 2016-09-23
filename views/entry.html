@@ -1,0 +1,64 @@
+<div class="col-md-6">
+	<div class="well entry">
+		<div class="row">			
+			<h2 class="name">{{ name }} (<span class="symbol">{{ symbol }}</span>)</h2>
+			<hr>
+		</div>			
+		
+		<div class="values row">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="value">
+						<p>
+							<b>Value</b>
+						</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="units">
+						<p>
+							<b>Units</b>
+						</p>
+					</div>
+				</div>
+			</div>
+		
+			{% for value in values %}
+				<div class="row">
+					<div class="col-md-6">
+						<div class="value">
+							<p>{{ value.value }}</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="units">
+							<p>{{ value.units }}</p>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
+		<div class="description row">
+			<div class="col-md-12">
+				<p>
+					<b>Description</b>
+				</p>
+				<p class="description-text">
+					{{ description }}
+				</p>
+			</div>
+		</div>
+		<div class="tags row">
+			<div class="col-md-6">
+				<span>
+					<b>Tags:</b>	
+				</span>
+				{% for tag in tags %}
+					<span class="tag text-muted">
+						{{ tag }}
+					</span>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,52 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: #b0a18e;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
+
+#header {
+	background-color: #262216;
+	color: #777;
+	border-color: #262216;
+}
+
+.navbar-nav > li > a.nav-text:hover {
+	color: #777;
+}
+
+hr {
+    padding: 0;
+    border: none;
+    border-top: medium double #333;
+    color: #333;
+    text-align: center;
+}
+
+hr:after {
+    content: "§";
+    display: inline-block;
+    position: relative;
+    top: -0.7em;
+    font-size: 1.5em;
+    padding: 0 0.25em;
+    background: white;
+}
+
+div.entry {
+	padding-left: 50px;
+	padding-right: 50px;
+}
+
+div.description > div {
+	padding: 0px;
+	margin: 0px;
+}
+
+#262216
+#49412c
+#97743a
+#b0a18e

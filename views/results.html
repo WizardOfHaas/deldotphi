@@ -1,0 +1,52 @@
+{% for data in results %}
+<div class="col-md-6">
+	<div class="well entry">
+		<div class="row">			
+			<h2 class="name">{{ data.name }} (<span class="symbol">{{ data.symbol }}</span>)</h2>
+			<hr>
+		</div>			
+		
+		<div class="values row">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="value">
+						<p>
+							<b>Value</b>
+						</p>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="units">
+						<p>
+							<b>Units</b>
+						</p>
+					</div>
+				</div>
+			</div>
+		
+			{% for value in data.values %}
+				<div class="row">
+					<div class="col-md-6">
+						<div class="value">
+							<p>{{ value.value }}</p>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="units">
+							<p>{{ value.units }}</p>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+
+			<div class="row">
+				<div class="col-md-12">
+					<span class="pull-right">
+						[<a href="/view/{{ data.name }}">View</a>]
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endfor %}
