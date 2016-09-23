@@ -83,6 +83,7 @@ router.post('/edit', function(req, res, next){
 	MongoClient.connect(url, function(err, db){
 		if(!err){
 			data.date = new Date();
+			data.tags = data.tags.split(",");
 			db.collection('entries').insert(data, function(err, r){
 				if(!err){					
 					res.redirect('/view/' + data.name);
@@ -142,6 +143,11 @@ function find_entry(options, callback){
 				]
 			).toArray(function(err, data){
 				if(!err){
+					data = data.map(function(d){
+						//console.log(d);
+						d.tags = d.tags.join(",");
+						return d;
+					});
 					callback(null, data);
 				}else{
 					callback(err, null)
