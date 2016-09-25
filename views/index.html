@@ -1,5 +1,28 @@
 {% extends "layout.html" %}
 
 {% block content %}
-	{% include "results.html" ignore missing %}
+	<div class="col-md-12">
+		<div class="row">
+			{% include "results.html" ignore missing %}
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<div class="tags well">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		$.get('/tags', function(d){
+			d.forEach(function(tag){
+				$(".tags").append(
+					"<a href='/tags/" + tag.tag + "'><div class='tag label label-default'>" +
+						tag.tag + ":" + tag.count +
+					"</div></a>"
+				);
+			});
+		});
+	</script>
 {% endblock %}

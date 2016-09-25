@@ -1,3 +1,24 @@
-<pre>
-	{{ message }}
-</pre>
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="col-md-12">
+	<div class="well">
+		<div class="row">
+			<div class="col-md-3 text-right">
+				<h1>
+					Error:
+				</h1>
+			</div>
+			<div class="col-md-6 error-msg">
+				<h2>{{ message }}</h2>
+			</div>
+		</div>
+
+		<br><br>
+
+		<code>
+			{{ error }}
+		</code>
+	</div>
+</div>
+{% endblock %}

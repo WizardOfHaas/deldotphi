@@ -46,6 +46,15 @@ div.description > div {
 	margin: 0px;
 }
 
+.error-msg{
+  color: red;
+}
+
+.tag{
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
 #262216
 #49412c
 #97743a

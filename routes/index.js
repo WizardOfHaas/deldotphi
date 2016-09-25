@@ -3,6 +3,7 @@ var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var google = require('googleapis');
 var OAuth2 = google.auth.OAuth2;
+var plus = google.plus('v1');
 
 var config = require('../config.json');
 
@@ -11,7 +12,8 @@ var url = 'mongodb://localhost:27017/deldotphi';
 var oauth2Client = new OAuth2(config.oauth.clientID, config.oauth.secret, 'http://localhost:3000/login/');
 
 var scopes = [
-  'https://www.googleapis.com/auth/plus.me'
+  'https://www.googleapis.com/auth/plus.me',
+  'https://www.googleapis.com/auth/userinfo.email'
 ];
 
 var oauth_url = oauth2Client.generateAuthUrl({
@@ -39,8 +41,54 @@ router.get('/', function(req, res, next) {
 
 router.get('/login', function(req, res, next){
 	if(req.query.code){
-		res.cookie('auth', true);
-		res.redirect(req.cookies.redirect);
+		oauth2Client.getToken(req.query.code, function(err, tokens){
+			if(!err){
+				oauth2Client.setCredentials({
+					access_token: tokens.access_token
+				});
+
+					plus.people.get({
+						userId: 'me',
+						auth: oauth2Client
+					}, function(err, resp){
+						if(!err){
+							var email = resp.emails[0].value;
+
+							MongoClient.connect(url, function(err, db){
+								if(!err){
+									db.collection('users').find({
+										user: email
+									}).toArray(function(err, data){
+										if(data.length > 0 && data[0].user == email){
+											res.cookie('auth', true);
+											res.cookie('user', email);
+											res.redirect(req.cookies.redirect);
+										}else{
+											res.render('error.html', {
+												title: "Authentication Error",
+												error: "",
+												message: "Your email is not on the list. Talk to Sean about joining the closed beta."
+											});
+										}
+									});
+								}
+							});
+						}else{
+							res.render('error.html', {
+								title: "Authentication Error",
+								error: err,
+								message: "Something went wrong..."
+							});
+						}
+				});
+			}else{
+				res.render('error.html', {
+					title: "Authentication Error",
+					error: err,
+					message: "Something went wrong..."
+				});
+			}
+		});
 	}else if(req.cookies.auth == "true"){
 		res.redirect('/');
 	}else{
@@ -75,7 +123,8 @@ router.get('/view/:name', function(req, res, next){
 	}, function(err, data){
 		if(!err){
 			data[0].title = req.params.name;			
-			data[0].auth = req.cookies.auth;
+			data[0].auth = req.cookies.auth;		
+
 			res.render('view.html', data[0]);
 		}else{
 			res.send(err);
@@ -92,12 +141,15 @@ router.get('/edit/:name', isAuthed, function(req, res, next){
 		if(!err){
 			if(data.length > 0){
 				data[0].title = req.params.name;
-				data[0].auth = req.cookies.auth;		
+				data[0].auth = req.cookies.auth;
+				data[0].user = req.cookies.user;
+
 				res.render('edit.html', data[0]);
 			}else{
 				res.render('edit.html', {
 					title: "New Entry",
 					auth: req.cookies.auth,
+					user: req.cookies.user,
 					values: [
 						{
 							value: "",
@@ -150,6 +202,38 @@ router.get('/search', function(req, res, next){
 	});
 });
 
+router.get('/tags', function(req, res, next){
+	get_tags(function(err, data){
+		if(!err){
+			res.send(data);
+		}else{
+			res.render('error.html', {
+				title: "DB Error",
+				error: err
+			});
+		}
+	});
+});
+
+router.get('/tags/:tag', function(req, res, next){
+	find_entry({
+		query: {
+			tags: {$in: [req.params.tag]}
+		}
+	}, function(err, data){
+		if(!err){
+			res.render('search.html', {
+				title: "Tagged with " + req.params.tag,
+				auth: req.cookies.auth,
+				results: data
+			});
+		}else{
+			res.send(err);
+		}
+	});
+});
+
+
 function find_entry(options, callback){
 	MongoClient.connect(url, function(err, db) {
 		if(!err){
@@ -169,7 +253,8 @@ function find_entry(options, callback){
 							values: {$first: "$values"},
 							description: {$first: "$description"},
 							tags: {$first: "$tags"},
-							user: {$first: "$user"}
+							user: {$first: "$user"},
+							date: {$first: "$date"}
 						}
 					}
 				]
@@ -201,6 +286,53 @@ function isAuthed(req, res, next){
 		res.cookie("redirect", req.url);
 		res.redirect("/login");
 	}
+}
+
+function get_tags(callback){
+	MongoClient.connect(url, function(err, db){
+		if(!err){
+			db.collection("entries").aggregate(
+				[
+					{
+						$project: {
+							name: "$name",
+							tags: "$tags",
+							date: "$date"
+						}
+					},{
+						$sort: {
+							date: -1
+						}
+					},{
+						$group: {
+							_id: "$name",
+							tags: {$first: "$tags"}
+						}
+					},{
+						$unwind: "$tags"
+					},{
+						$group: {
+							_id: "$tags",
+							tag: {$first: "$tags"},
+							count: {$sum: 1}
+						}
+					},{
+						$sort: {
+							tag: 1
+						}
+					}
+				]
+			).toArray(function(err, data){
+				if(!err){
+					callback(null, data);
+				}else{
+					callback(err, null);
+				}
+			});
+		}else{
+			callback(err, null);
+		}
+	});
 }
 
 module.exports = router;
