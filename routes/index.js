@@ -91,6 +91,7 @@ router.get('/login', function(req, res, next){
 
 router.get('/logout', function(req, res, next){
 	res.cookie('auth', false);
+	res.cookie("redirect", '/');
 	res.redirect('/');
 });
 

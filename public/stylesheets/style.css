@@ -55,6 +55,21 @@ div.description > div {
   margin-right: 2px;
 }
 
+.footer {
+  position: relative;
+  margin-top: -50px;
+  height: 50px;
+  clear: both;
+  padding-top:20px;
+  padding-right: 30px;  
+}
+
+.footer > p {
+  font-size: 10px;
+  padding: 0px;
+  margin: 0px;
+}
+
 #262216
 #49412c
 #97743a
