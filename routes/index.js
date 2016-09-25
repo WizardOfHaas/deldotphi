@@ -5,6 +5,9 @@ var google = require('googleapis');
 var OAuth2 = google.auth.OAuth2;
 var plus = google.plus('v1');
 
+var showdown  = require('showdown'),
+    converter = new showdown.Converter();
+
 var config = require('../config.json');
 
 var url = 'mongodb://localhost:27017/deldotphi'; 
@@ -23,19 +26,9 @@ var oauth_url = oauth2Client.generateAuthUrl({
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	find_entry({
-		query: {
-			name: {$regex: ""}
-		}
-	}, function(err, data){
-		if(!err){
-			res.render('index.html', {
-				results: data,
-				auth: req.cookies.auth
-			});
-		}else{
-			res.send(err);
-		}
+	res.render('index.html', {
+		title: "Home",
+		auth: req.cookies.auth
 	});
 });
 
@@ -123,7 +116,8 @@ router.get('/view/:name', function(req, res, next){
 	}, function(err, data){
 		if(!err){
 			data[0].title = req.params.name;			
-			data[0].auth = req.cookies.auth;		
+			data[0].auth = req.cookies.auth;
+			data[0].description = converter.makeHtml(data[0].description);
 
 			res.render('view.html', data[0]);
 		}else{
@@ -187,13 +181,17 @@ router.post('/edit', isAuthed, function(req, res, next){
 router.get('/search', function(req, res, next){
 	find_entry({
 		query: {
-			name: {$regex: req.query.q}
+			//name: {$regex: req.query.q}
+			$text: {
+				$search: req.query.q
+			}
 		}
 	}, function(err, data){
 		if(!err){
 			res.render('search.html', {
 				title: "Search Results for " + req.query.q,
 				auth: req.cookies.auth,
+				query: req.query.q,
 				results: data
 			});
 		}else{
@@ -262,7 +260,7 @@ function find_entry(options, callback){
 				if(!err){
 					data = data.map(function(d){
 						//console.log(d);
-						d.tags = d.tags.join(",");
+						d.tags = d.tags.join(",");						
 						return d;
 					});
 					callback(null, data);
