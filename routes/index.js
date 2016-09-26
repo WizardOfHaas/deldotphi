@@ -12,7 +12,7 @@ var config = require('../config.json');
 
 var url = 'mongodb://localhost:27017/deldotphi'; 
 
-var oauth2Client = new OAuth2(config.oauth.clientID, config.oauth.secret, 'http://localhost:3000/login/');
+var oauth2Client = new OAuth2(config.oauth.clientID, config.oauth.secret, config.oauth.callback);
 
 var scopes = [
   'https://www.googleapis.com/auth/plus.me',
