@@ -284,6 +284,9 @@ router.get('/tags', function(req, res, next){
 router.get('/tags/:tag', function(req, res, next){
 	find_entry({
 		query: {
+			date: {$exists: true}
+		},
+		post_query: {
 			tags: {$in: [req.params.tag]}
 		}
 	}, function(err, data){
@@ -330,6 +333,10 @@ function find_entry(options, callback){
 
 			if(options.limit){
 				ag_pipe.push({$limit: options.limit});
+			}
+
+			if(options.post_query){
+				ag_pipe.push({$match: options.post_query});
 			}
 
 			db.collection('entries').aggregate(
