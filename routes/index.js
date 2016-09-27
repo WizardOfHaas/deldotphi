@@ -31,7 +31,28 @@ router.get('/', function(req, res, next) {
 		auth: req.cookies.auth
 	};
 
-	res.render('index.html', res_data);
+	if(req.cookies.msg && req.cookies.smg != ""){
+		res_data.message = req.cookies.msg
+		res.cookie('msg', "");
+	}
+
+	find_entry({
+		query: {
+			date: {$exists: true}
+		},
+		limit: 2,
+		sort: {date: -1}
+	}, function(err, data){
+		if(!err){
+			res_data.results = data;
+			res.render('index.html', res_data);
+		}else{
+			res.render('error.html', {
+				title: "DB Error",
+				error: err
+			});
+		}
+	});
 });
 
 router.get('/login', function(req, res, next){
@@ -115,7 +136,9 @@ router.post('/user/add', function(req, res, next){
 						if(data[0].key == req.body.key){
 							db.collection('users').insert({user: req.body.email});
 							db.collection('keys').remove({key: req.body.key});
-							res.send("OKKK!");
+
+							res.cookie('msg', "API Key redeemed. You should now be able to login.");
+							res.redirect("/");
 							db.close();
 						}else{
 							res.render('error.html',
@@ -280,27 +303,37 @@ router.get('/tags/:tag', function(req, res, next){
 function find_entry(options, callback){
 	MongoClient.connect(url, function(err, db) {
 		if(!err){
-			db.collection('entries').aggregate(
-				[
-					{
-						$match: options.query
-					},{
-						$sort: {
-							date: -1
-						}
-					},{
-						$group: {
-							_id: "$name",
-							name: {$first: "$name"},
-							symbol: {$first: "$symbol"},
-							values: {$first: "$values"},
-							description: {$first: "$description"},
-							tags: {$first: "$tags"},
-							user: {$first: "$user"},
-							date: {$first: "$date"}
-						}
+			var ag_pipe = [
+				{
+					$match: options.query
+				},{
+					$sort: {
+						date: -1
 					}
-				]
+				},{
+					$group: {
+						_id: "$name",
+						name: {$first: "$name"},
+						symbol: {$first: "$symbol"},
+						values: {$first: "$values"},
+						description: {$first: "$description"},
+						tags: {$first: "$tags"},
+						user: {$first: "$user"},
+						date: {$first: "$date"}
+					}
+				}
+			];
+
+			if(options.sort){
+				ag_pipe.push({$sort: options.sort});
+			}
+
+			if(options.limit){
+				ag_pipe.push({$limit: options.limit});
+			}
+
+			db.collection('entries').aggregate(
+				ag_pipe
 			).toArray(function(err, data){
 				if(!err){
 					data = data.map(function(d){
