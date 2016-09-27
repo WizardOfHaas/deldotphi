@@ -133,7 +133,7 @@ router.post('/user/add', function(req, res, next){
 					key: req.body.key
 				}).toArray(function(err, data){
 					if(!err){
-						if(data[0].key == req.body.key){
+						if(data[0] && data[0].key == req.body.key){
 							db.collection('users').insert({user: req.body.email});
 							db.collection('keys').remove({key: req.body.key});
 
@@ -249,7 +249,6 @@ router.post('/edit', isAuthed, function(req, res, next){
 router.get('/search', function(req, res, next){
 	find_entry({
 		query: {
-			//name: {$regex: req.query.q}
 			$text: {
 				$search: req.query.q
 			}
