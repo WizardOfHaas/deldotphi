@@ -26,10 +26,12 @@ var oauth_url = oauth2Client.generateAuthUrl({
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	res.render('index.html', {
+	var res_data = {
 		title: "Home",
 		auth: req.cookies.auth
-	});
+	};
+
+	res.render('index.html', res_data);
 });
 
 router.get('/login', function(req, res, next){
@@ -93,6 +95,48 @@ router.get('/logout', function(req, res, next){
 	res.cookie('auth', false);
 	res.cookie("redirect", '/');
 	res.redirect('/');
+});
+
+router.get('/user/add', function(req, res, next){
+	res.render('add_user.html', {title: "Redeem API Key"});
+});
+
+router.post('/user/add', function(req, res, next){
+	if(
+		req.body.email &&
+		req.body.key
+	){
+		MongoClient.connect(url, function(err, db){
+			if(!err){
+				db.collection('keys').find({
+					key: req.body.key
+				}).toArray(function(err, data){
+					if(!err){
+						if(data[0].key == req.body.key){
+							db.collection('users').insert({user: req.body.email});
+							db.collection('keys').remove({key: req.body.key});
+							res.send("OKKK!");
+							db.close();
+						}else{
+							res.render('error.html',
+								{
+									title: "Authentication Error",
+									message: "Bad API Key"
+								}
+							);
+						}
+					}
+				});
+			}
+		});
+	}else{
+		res.render('error.html',
+			{
+				title: "Authentication Error",
+				message: "Malformed API Request"
+			}
+		);
+	}
 });
 
 router.get('/fetch/:name', function(req, res, next){

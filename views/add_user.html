@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block content %}
+	<div class="col-md-12">
+		<div class="well">
+			<h2>Redeem an API Key</h2>
+			<p>DelDotPhi is currently in closed beta. To login and make edits to the system, you need an API key. If you have an API key, enter it below. The email field must match your Google email address.</p><br>
+
+			<form action="/user/add" method="post">
+				<div class="row">
+					<div class="col-md-6">
+						<label for="name">Email Address</label>
+						<input class="form-control" type="email" name="email">
+					</div>
+					<div class="col-md-6">
+						<label for="symbol">API Key</label>
+						<input class="form-control" type="text" name="key">
+					</div>
+				</div>
+
+				<br>
+
+				<div class="row">
+					<div class="col-md-12">
+						<button class="btn btn-default pull-right" value="Submit">Submit</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}

@@ -2,6 +2,16 @@
 
 {% block content %}
 	<div class="col-md-12">
+		{% if message %}
+		<div class="row">
+			<div class="col-md-12">
+				<div class="alert alert-success">
+					{{ message }}
+				</div>
+			</div>
+		</div>
+		{% endif %}
+
 		<div class="row">
 			<div class="col-md-12">
 				<div class="well">
