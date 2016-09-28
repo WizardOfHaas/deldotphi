@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<form method="post" action="/edit">
-	<div class="col-md-12">
-		<div class="well entry">
+<div class="col-md-12">
+	<div class="well entry">
+		<form method="post" action="/edit">
 			<div class="row">
 				<div class="col-md-6">
 					<label for="name">Entry Name</label>
@@ -79,9 +79,16 @@
 
 		<div class="row">
 			<div class="col-md-12">
-				<button class="btn btn-default pull-right" value="Submit">Save</button>
+				<button class="btn btn-default pull-right" value="Submit">&nbsp;Save&nbsp;</button>
 			</div>
-		</div>
+		</form>
 	</div>
-</form>
+
+	<div class="row">
+		<form action="/remove" method="post">
+			<input type="hidden" name="name" value="{{ name }}">
+			<button class="btn btn-danger pull-right" value="Submit">Remove</button>
+		</form>
+	</div>
+</div>
 {% endblock %}

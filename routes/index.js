@@ -63,39 +63,43 @@ router.get('/login', function(req, res, next){
 					access_token: tokens.access_token
 				});
 
-					plus.people.get({
-						userId: 'me',
-						auth: oauth2Client
-					}, function(err, resp){
-						if(!err){
-							var email = resp.emails[0].value;
+				plus.people.get({
+					userId: 'me',
+					auth: oauth2Client
+				}, function(err, resp){
+					if(!err){
+						var email = resp.emails[0].value;
+						MongoClient.connect(url, function(err, db){
+							if(!err){
+								db.collection('users').find({
+									user: email
+								}).toArray(function(err, data){
+									if(data.length > 0 && data[0].user == email){
+										res.cookie('auth', true);
+										res.cookie('user', email);
 
-							MongoClient.connect(url, function(err, db){
-								if(!err){
-									db.collection('users').find({
-										user: email
-									}).toArray(function(err, data){
-										if(data.length > 0 && data[0].user == email){
-											res.cookie('auth', true);
-											res.cookie('user', email);
+										if(req.cookies.redirect){
 											res.redirect(req.cookies.redirect);
 										}else{
-											res.render('error.html', {
-												title: "Authentication Error",
-												error: "",
-												message: "Your email is not on the list. Talk to Sean about joining the closed beta."
-											});
+											res.redirect("/");
 										}
-									});
-								}
-							});
-						}else{
-							res.render('error.html', {
-								title: "Authentication Error",
-								error: err,
-								message: "Something went wrong..."
-							});
-						}
+									}else{
+										res.render('error.html', {
+											title: "Authentication Error",
+											error: "",
+											message: "Your email is not on the list. Talk to Sean about joining the closed beta."
+										});
+									}
+								});
+							}
+						});
+					}else{
+						res.render('error.html', {
+							title: "Authentication Error",
+							error: err,
+							message: "Something went wrong..."
+						});
+					}
 				});
 			}else{
 				res.render('error.html', {
@@ -246,6 +250,31 @@ router.post('/edit', isAuthed, function(req, res, next){
 	});
 });
 
+router.post('/remove', isAuthed, function(req, res, next){
+	if(
+		req.body.name
+	){
+		MongoClient.connect(url, function(err, db){
+			if(!err){
+				db.collection('entries').remove({
+					name: req.body.name
+				}, function(err, r){
+					if(!err){
+						res.cookie('msg', '"' + req.body.name + '" removed from database.');
+						res.redirect("/");
+						db.close();
+					}
+				});
+			}
+		});
+	}else{
+		res.render("error.html", {
+			title: "API Error",
+			message: "Malformed API request."
+		})
+	}
+});
+
 router.get('/search', function(req, res, next){
 	find_entry({
 		query: {
@@ -344,7 +373,9 @@ function find_entry(options, callback){
 				if(!err){
 					data = data.map(function(d){
 						//console.log(d);
-						d.tags = d.tags.join(",");						
+						d.tags = d.tags.join(",");
+						d.user = d.user.substring(0, d.user.indexOf('@'));
+
 						return d;
 					});
 					callback(null, data);
