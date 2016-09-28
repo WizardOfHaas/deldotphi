@@ -6,7 +6,7 @@
 		<div class="row">			
 			<h2 class="name">{{ name }} (<span class="symbol">{{ symbol }}</span>)</h2>
 			<span class="pull-right">
-				[<a href="/edit/{{ name }}">edit</a>]
+				[<a href="/edit/{{ name | urlencode }}">edit</a>]
 			</span>
 			<hr>
 		</div>			

@@ -310,13 +310,17 @@ router.get('/tags', function(req, res, next){
 });
 
 router.get('/tags/:tag', function(req, res, next){
+	var q = {tags: {$in: [req.params.tag]}};
+	
+	if(req.params.tag == "everything"){
+		q = {tags: {$exists: true}};
+	}	
+
 	find_entry({
 		query: {
 			date: {$exists: true}
 		},
-		post_query: {
-			tags: {$in: [req.params.tag]}
-		}
+		post_query: q
 	}, function(err, data){
 		if(!err){
 			res.render('search.html', {
