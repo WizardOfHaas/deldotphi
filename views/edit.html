@@ -84,11 +84,13 @@
 		</form>
 	</div>
 
+	{% if name %}
 	<div class="row">
 		<form action="/remove" method="post">
 			<input type="hidden" name="name" value="{{ name }}">
 			<button class="btn btn-danger pull-right" value="Submit">Remove</button>
 		</form>
 	</div>
+	{% endif %}
 </div>
 {% endblock %}
