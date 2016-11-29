@@ -1,8 +1,10 @@
 {% for data in results %}
 <div class="col-md-6">
-	<div class="well entry">
-		<div class="row">			
-			<h2 class="name">{{ data.name }} (<span class="symbol">{{ data.symbol }}</span>)</h2>
+	<div class="well result entry">
+		<div class="row">
+			<a href="/view/{{ data.name | urlencode}}">
+				<h2 class="name">{{ data.name }} (<span class="symbol">{{ data.symbol }}</span>)</h2>
+			</a>
 			<hr>
 		</div>			
 		
@@ -24,20 +26,20 @@
 				</div>
 			</div>
 		
-			{% for value in data.values %}
+			<div class="values">
 				<div class="row">
 					<div class="col-md-6">
 						<div class="value">
-							<p>{{ value.value }}</p>
+							<p>{{ data.values[0].value }}</p>
 						</div>
 					</div>
 					<div class="col-md-6">
 						<div class="units">
-							<p>{{ value.units }}</p>
+							<p>{{ data.values[0].units }}</p>
 						</div>
 					</div>
 				</div>
-			{% endfor %}
+			</div>
 
 			<div class="row">
 				<div class="col-md-12">

@@ -35,6 +35,7 @@
 					</div>
 				</div>
 			
+				<div id="values">
 				{% for i in range(0, values.length) %}
 					<div class="row">
 						<div class="col-md-6">
@@ -49,6 +50,10 @@
 						</div>
 					</div>
 				{% endfor %}
+				</div>
+				<div id="new-value" class="btn btn-default pull-left">
+					Add Value
+				</div>
 			</div>
 			
 			<br>	
@@ -83,6 +88,31 @@
 			</div>
 		</form>
 	</div>
+
+	<script>
+		var vals = {{ values.length }};
+
+		$("#new-value").click(function(){
+			console.log("e");
+
+			vals++;
+
+			$("#values").append(
+				'<div class="row">' +
+					'<div class="col-md-6">' +
+						'<div class="value">' +
+							'<input class="form-control" type="text" name="values[' + vals + '][value]" placeholder="Value">' +
+							'</div>'+
+						'</div>' +
+						'<div class="col-md-6">' +
+							'<div class="units">' +
+								'<input class="form-control" type="text" name="values[' + vals + '][units]" placeholder="Units">' +
+						'</div>' +
+					'</div>' +
+				'</div>'
+			);
+		});
+	</script>
 
 	{% if name %}
 	<div class="row">

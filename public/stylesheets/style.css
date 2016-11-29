@@ -41,6 +41,10 @@ div.entry {
 	padding-right: 50px;
 }
 
+div.result {
+  //height: 220px;
+}
+
 div.description > div {
 	padding: 0px;
 	margin: 0px;
@@ -68,6 +72,14 @@ div.description > div {
   font-size: 10px;
   padding: 0px;
   margin: 0px;
+}
+
+#values > .row {
+  padding-bottom: 10px;
+}
+
+div.value, div.units {
+  margin-left: 10px;
 }
 
 /* The ribbons */

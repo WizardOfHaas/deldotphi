@@ -237,6 +237,10 @@ router.post('/edit', isAuthed, function(req, res, next){
 		if(!err){
 			data.date = new Date();
 			data.tags = data.tags.split(",");
+			data.values = data.values.filter(function(d){
+				return d.value != '';
+			});
+
 			db.collection('entries').insert(data, function(err, r){
 				if(!err){					
 					res.redirect('/view/' + data.name);

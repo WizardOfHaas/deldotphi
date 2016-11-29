@@ -3,7 +3,22 @@
 {% block content %}
 	<div class="col-md-12">
 		<div class="row">
-			{% include "results.html" ignore missing %}
+			{% if results.length == 0 %}
+				<div class="col-md-12">
+					<div class="well">
+						<div class="row">
+							<div class="col-md-12 text-center">
+								<h3>
+									No Entries Found with<br>
+									"{{ query }}"
+								</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% else %}
+				{% include "results.html" ignore missing %}
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}
