@@ -98,6 +98,11 @@ div.value, div.units {
   -webkit-transform: rotate(-45deg);
 }
 
+.result {
+  height: 230px;
+  overflow: hidden;
+}
+
 /* Custom styles */
 
 .corner-ribbon.sticky{
